@@ -245,6 +245,8 @@ button.ghost{background:transparent;border:1px solid var(--line);font-size:16px;
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
 <script src="peerjs.min.js"></script>
 <script src="body.js"></script>
+<script src="human.js"></script>
+<script src="brute.js"></script>
 <script src="clips.js"></script>
 <script>
 (function(){
@@ -413,18 +415,18 @@ const WIDE={straight:1,hook:1,overhand:1,high:1,upper:1};
 
 /* ---------- state ---------- */
 const ROSTER=[
-  {name:'강태산',cls:'미들급',ht:185,wt:84,rc:190,rec:'18-3-0',nick:'THE MOUNTAIN',style:'올라운더',desc:'타격과 레슬링 모두 고르게 잘하는 균형형. 어떤 상대에게도 무난해요.',skin:0xc4936e,shorts:0xb3261e,hair:0x16120f,st:{pw:78,sp:76,ca:76,gr:72}},
-  {name:'블라드 코렌',cls:'라이트헤비급',ht:190,wt:93,rc:193,rec:'22-4-0',nick:'THE BEAR',style:'레슬러',desc:'묵직한 펀치와 테이크다운이 무기. 그라운드로 끌고 가면 강해요.',skin:0xdcb096,shorts:0x1f4fb3,hair:0x5a4630,st:{pw:84,sp:62,ca:72,gr:90}},
-  {name:'하비에르 로하스',cls:'라이트급',ht:180,wt:70,rc:188,rec:'15-2-0',nick:'EL RAYO',style:'킥복서',desc:'빠른 발과 킥. 거리를 두고 쌓아가는 스타일이에요.',skin:0xa8724f,shorts:0xe3a21a,hair:0x120d0a,st:{pw:66,sp:92,ca:80,gr:56}},
-  {name:'오카다 렌',cls:'웰터급',ht:178,wt:77,rc:183,rec:'19-5-1',nick:'RONIN',style:'주짓수',desc:'서브미션 장인. 타격은 약하지만 바닥에서는 가장 위험해요.',skin:0xd9b38c,shorts:0x2f9e57,hair:0x0f0f12,st:{pw:60,sp:74,ca:86,gr:96}},
-  {name:'말릭 오웬스',cls:'라이트헤비급',ht:183,wt:93,rc:196,rec:'14-3-0',nick:'THE HAMMER',style:'파워 펀처',desc:'한 방이면 끝. 대신 스태미나가 빨리 떨어져요.',skin:0x6b4423,shorts:0x7d3cc4,hair:0x0a0806,st:{pw:96,sp:66,ca:56,gr:62}},
-  {name:'에릭 룬드',cls:'헤비급',ht:192,wt:106,rc:198,rec:'20-6-0',nick:'VIKING',style:'탱크',desc:'지치지 않는 체력과 압박. 5분 내내 같은 속도로 몰아붙여요.',skin:0xe8c4a8,shorts:0x2aa7b8,hair:0xb08a4a,st:{pw:76,sp:63,ca:96,gr:76}}
+  {name:'강태산',cls:'미들급',ht:185,wt:84,rc:190,rec:'18-3-0',nick:'THE MOUNTAIN',style:'올라운더',desc:'타격과 레슬링 모두 고르게 잘하는 균형형. 어떤 상대에게도 무난해요.',skin:0xc4936e,shorts:0xb3261e,hair:0x16120f,face:'A',st:{pw:78,sp:76,ca:76,gr:72}},
+  {name:'블라드 코렌',cls:'라이트헤비급',ht:190,wt:93,rc:193,rec:'22-4-0',nick:'THE BEAR',style:'레슬러',desc:'묵직한 펀치와 테이크다운이 무기. 그라운드로 끌고 가면 강해요.',skin:0xdcb096,shorts:0x1f4fb3,hair:0x5a4630,body:'brute',st:{pw:84,sp:62,ca:72,gr:90}},
+  {name:'하비에르 로하스',cls:'라이트급',ht:180,wt:70,rc:188,rec:'15-2-0',nick:'EL RAYO',style:'킥복서',desc:'빠른 발과 킥. 거리를 두고 쌓아가는 스타일이에요.',skin:0xa8724f,shorts:0xe3a21a,hair:0x120d0a,face:'B',st:{pw:66,sp:92,ca:80,gr:56}},
+  {name:'오카다 렌',cls:'웰터급',ht:178,wt:77,rc:183,rec:'19-5-1',nick:'RONIN',style:'주짓수',desc:'서브미션 장인. 타격은 약하지만 바닥에서는 가장 위험해요.',skin:0xd9b38c,shorts:0x2f9e57,hair:0x0f0f12,face:'A',st:{pw:60,sp:74,ca:86,gr:96}},
+  {name:'말릭 오웬스',cls:'라이트헤비급',ht:183,wt:93,rc:196,rec:'14-3-0',nick:'THE HAMMER',style:'파워 펀처',desc:'한 방이면 끝. 대신 스태미나가 빨리 떨어져요.',skin:0x6b4423,shorts:0x7d3cc4,hair:0x0a0806,face:'A',st:{pw:96,sp:66,ca:56,gr:62}},
+  {name:'에릭 룬드',cls:'헤비급',ht:192,wt:106,rc:198,rec:'20-6-0',nick:'VIKING',style:'탱크',desc:'지치지 않는 체력과 압박. 5분 내내 같은 속도로 몰아붙여요.',skin:0xe8c4a8,shorts:0x2aa7b8,hair:0xb08a4a,face:'B',st:{pw:76,sp:63,ca:96,gr:76}}
 ];
 const ALT_SHORTS=0xeeeeee;
 const CFG=[Object.assign({fid:0},ROSTER[0]),Object.assign({fid:1},ROSTER[1])];
 const ST=(f,k)=>(((CFG[f.i].st||{})[k]||75)-75)/100;
 function setFighter(i,fid){ fid=Math.max(0,Math.min(ROSTER.length-1,fid|0)); const c=Object.assign({fid},ROSTER[fid]); if(i===1&&CFG[0].fid===fid) c.shorts=ALT_SHORTS; if(i===0&&CFG[1].fid===fid){ CFG[1].shorts=ALT_SHORTS; if(F[1]) paintFighter(F[1]); } else if(i===0&&CFG[1].shorts===ALT_SHORTS&&CFG[1].fid!==fid){ CFG[1].shorts=ROSTER[CFG[1].fid].shorts; if(F[1]) paintFighter(F[1]); }
-  CFG[i]=c; if(F[i]) paintFighter(F[i]); setNames(); }
+  CFG[i]=c; if(F[i]){ paintFighter(F[i]); selectBody(F[i]); } setNames(); }
 function setNames(){ for(let i=0;i<2;i++){ const el=document.querySelector('#p'+i+' .who'); if(el) el.textContent=CFG[i].name; } }
 const F=[]; let G=null, TDA=null;
 const NET={mode:'off',room:null,code:'',peer:null,seq:0,keys:[],lastSeq:0,ev:[],evId:0,seenEv:0,snapT:0,lostT:0,jd:[null,null]};
@@ -646,7 +648,7 @@ function crowdCheer(v){ if(!actx) return; crowdAudioInit(); const t=actx.current
 /* ---------- referee: a third mannequin driven straight from the mocap clips ---------- */
 const REF={model:null,bones:null,pos:new THREE.Vector3(0,0,-2.6),yaw:0,walkPh:0,wW:0,gestR:0,gestL:0,gR:0,gL:0,wave:0,tgt:new THREE.Vector3(0,0,-2.6),face:null};
 function attachRef(gltf){ const model=gltf.scene, bones={};
-  model.traverse(o=>{ if(o.isBone) bones[o.name.replace(/^mixamorig:?/,'')]=o; if(o.isMesh){ o.castShadow=true; o.frustumCulled=false; o.material=o.material.clone(); o.material.map=null; o.material.metalness=0; o.material.roughness=.75; o.material.color.set(/Joints/.test(o.name)?0x141416:0x4a4e57); } });
+  model.traverse(o=>{ if(o.isBone) bones[o.name.replace(/^mixamorig\d*:?/,'')]=o; if(o.isMesh){ o.castShadow=true; o.frustumCulled=false; o.material=o.material.clone(); o.material.map=null; o.material.metalness=0; o.material.roughness=.75; o.material.color.set(/Joints/.test(o.name)?0x141416:0x4a4e57); } });
   if(!bones.Hips) return; scene.add(model); model.updateMatrixWorld(true); const k=SC*.95/bones.Hips.getWorldPosition(bv).y; model.scale.setScalar(k); model.updateMatrixWorld(true);
   REF.model=model; REF.bones=bones; REF.hips=bones.Hips; }
 const rq=new THREE.Quaternion(), rq2=new THREE.Quaternion(), rq3=new THREE.Quaternion(), rv=new THREE.Vector3();
@@ -1184,37 +1186,64 @@ function applyRig(m,c){
 const BONE_MAP=[['pelvis','Hips'],['spine','Spine'],['chest','Spine2'],['head','Head'],['lSh','LeftArm'],['lEl','LeftForeArm'],['rSh','RightArm'],['rEl','RightForeArm'],['lHip','LeftUpLeg'],['lKn','LeftLeg'],['rHip','RightUpLeg'],['rKn','RightLeg']];
 const TPOSE=N_({py:.9775,lsZ:HALF,rsZ:-HALF});
 const q1=new THREE.Quaternion(), q2=new THREE.Quaternion(), bv=new THREE.Vector3(), YAX=new THREE.Vector3(0,1,0);
-function paintFighter(f){ if(!f.paint) return; const cfg=CFG[f.i], sk=new THREE.Color(cfg.skin), sh=new THREE.Color(cfg.shorts);
-  for(const p of f.paint){ const a=p.o.geometry.attributes.color, col=a.array, s2=sk.clone(); if(p.joint) s2.multiplyScalar(.72);
-    for(let i=0;i<p.mask.length;i++){ const c=p.mask[i]?sh:s2; col[i*3]=c.r; col[i*3+1]=c.g; col[i*3+2]=c.b; } a.needsUpdate=true; } }
-function attachBody(f,gltf){
-  const model=gltf.scene, m=f.m, bones={}, meshes=[], skin=new THREE.Color(CFG[f.i].skin), shortsC=new THREE.Color(CFG[f.i].shorts);
-  model.traverse(o=>{ if(o.isBone) bones[o.name.replace(/^mixamorig:?/,'')]=o;
-    if(o.isMesh){ o.castShadow=true; o.frustumCulled=false; o.material=o.material.clone(); o.material.map=null; o.material.metalness=0; o.material.roughness=.62;
-      const sk=skin.clone(); if(/Joints/.test(o.name)) sk.multiplyScalar(.72); meshes.push([o,sk]); } });
+const BNAME=n=>n.replace(/^mixamorig\d*:?/,'');
+/* sample a texture: colour at a luminance percentile (opaque pixels), linear space, plus median luminance */
+function texMed(tex,pct){ try{ const im=tex&&tex.image; if(!im) return null; const c=document.createElement('canvas'); c.width=c.height=48; const x=c.getContext('2d'); x.drawImage(im,0,0,48,48); const d=x.getImageData(0,0,48,48).data, px=[];
+  for(let i=0;i<d.length;i+=4){ if(d[i+3]<160) continue; px.push([d[i]*.3+d[i+1]*.59+d[i+2]*.11,d[i],d[i+1],d[i+2]]); }
+  if(!px.length) return null; px.sort((a,b)=>a[0]-b[0]); const m=px[Math.floor((px.length-1)*pct)], md=px[px.length>>1], col=new THREE.Color(m[1]/255,m[2]/255,m[3]/255).convertSRGBToLinear(), ml=new THREE.Color(md[1]/255,md[2]/255,md[3]/255).convertSRGBToLinear();
+  col.lum=Math.max(.004,ml.r*.3+ml.g*.59+ml.b*.11); return col; }catch(e){ return null; } }
+/* paint a textured part a flat colour, keeping the texture's light/dark detail and alpha */
+function recolor(mat,ref){ const L={value:ref}; mat.onBeforeCompile=sh=>{ sh.uniforms.refL=L; sh.fragmentShader='uniform float refL;\n'+sh.fragmentShader.replace('#include <map_fragment>','#ifdef USE_MAP\n vec4 texelColor=mapTexelToLinear(texture2D(map,vUv)); float lm=dot(texelColor.rgb,vec3(.3,.59,.11)); diffuseColor.rgb*=.55+.9*clamp(lm/(refL*2.),0.,1.); diffuseColor.a*=texelColor.a;\n#endif'); }; mat.customProgramCacheKey=()=>'recolor'; mat.needsUpdate=true; }
+function ratioCol(want,med,lo,hi){ const c=new THREE.Color(want); if(!med) return c; for(const k of ['r','g','b']) c[k]=Math.max(lo,Math.min(hi,c[k]/Math.max(.02,med[k]))); return c; }
+const deep=h=>{ const c=new THREE.Color(h); c.r=Math.pow(c.r,1.6); c.g=Math.pow(c.g,1.6); c.b=Math.pow(c.b,1.6); return c; };
+function paintFighter(f){ if(!f.bodies) return; const cfg=CFG[f.i], R=ROSTER[cfg.fid]||{}, sk=deep(cfg.skin), sh=new THREE.Color(cfg.shorts);
+  for(const k in f.bodies){ const b=f.bodies[k];
+    for(const p of b.paint){ const a=p.o.geometry.attributes.color, col=a.array, s2=sk.clone(); if(p.joint) s2.multiplyScalar(.72);
+      for(let i=0;i<p.mask.length;i++){ const c=p.mask[i]?sh:s2; col[i*3]=c.r; col[i*3+1]=c.g; col[i*3+2]=c.b; } a.needsUpdate=true; }
+    for(const t of b.tint){ const want=t.role==='skin'?deep(cfg.skin):(t.role==='hair'?deep(cfg.hair):new THREE.Color(cfg.shorts)); t.o.material.color.copy(t.role==='keep'?new THREE.Color(1,1,1):(t.role==='skin'?ratioCol(want,t.med,.35,2.6):new THREE.Color(want)));
+      if(t.face) t.o.visible=t.face===(R.face||'A'); } } }
+function selectBody(f){ if(!f.bodies) return; const R=ROSTER[CFG[f.i].fid]||{}, b=f.bodies[R.body||'human']||f.bodies.human||f.bodies.xbot; if(!b) return;
+  for(const k in f.bodies) f.bodies[k].model.visible=false;
+  if(b!==f.body){ f.body=b; f.bodyRoot=null; f.clip=null; f.pClip=null; f.clipW=0; f.xf=0; f.ik=null; }
+  b.model.visible=f.bodyShown!==false; }
+function attachBody(f,gltf,kind,xr){
+  const model=gltf.scene, m=f.m, bones={}, meshes=[], tint=[], human=kind==='human', xbot=kind==='xbot';
+  model.traverse(o=>{ if(o.isBone) bones[BNAME(o.name)]=o;
+    if(o.isMesh){ o.castShadow=true; o.frustumCulled=false; o.material=o.material.clone(); const mn=o.material.name||'';
+      if(xbot||human&&mn==='body'){ o.material.map=null; o.material.metalness=0; o.material.roughness=.62; meshes.push(o); }
+      else { o.material.metalness=0; o.material.roughness=/hair|lash|beard|Hair|Moustache|Eyelash/.test(mn)?.8:.6;
+        if(/hair|lash|beard|Hair|Moustache|Eyelash/.test(mn)){ o.material.transparent=false; o.material.alphaTest=.42; o.material.side=THREE.DoubleSide; o.material.depthWrite=true; }
+        const fm=human&&mn.match(/^(face|hair|lash|beard)([AB])$/), role=human?(fm&&fm[1]==='face'?'skin':(fm&&(fm[1]==='hair'||fm[1]==='beard')?'hair':'keep')):(/Bottoms/.test(mn)?'shorts':'keep');
+        const med=role==='keep'?null:texMed(o.material.map,role==='skin'?.72:.5); if(med&&role!=='skin') recolor(o.material,med.lum); tint.push({o,role,face:fm?fm[2]:null,med}); o.material.needsUpdate=true; } } });
   if(!bones.Hips||!bones.LeftArm) return;
-  scene.add(model); model.updateMatrixWorld(true);
-  // paint shorts onto the body by rest-pose height (waist down to above the knee)
-  let lo=Infinity, hi=-Infinity; for(const [o] of meshes){ o.geometry.computeBoundingBox(); lo=Math.min(lo,o.geometry.boundingBox.min.y); hi=Math.max(hi,o.geometry.boundingBox.max.y); }
-  f.paint=meshes.map(([o])=>{ const pos=o.geometry.attributes.position, mask=new Uint8Array(pos.count); for(let i=0;i<pos.count;i++){ const h=(pos.getY(i)-lo)/(hi-lo); mask[i]=(h>.345&&h<.585)?1:0; }
+  model.updateMatrixWorld(true);
+  /* clips were baked on the xbot rig: per-bone rest-orientation offsets let them drive this skeleton */
+  let rt=null, hs=1; if(!xbot&&xr){ rt={}; const C={}; for(const n in bones) if(xr.q[n]) C[n]=xr.q[n].clone().invert().multiply(bones[n].getWorldQuaternion(new THREE.Quaternion()));
+    for(const n in C){ const p=bones[n].parent, pn=p&&p.isBone?BNAME(p.name):null; rt[n]=[pn&&C[pn]?C[pn].clone().invert():new THREE.Quaternion(),C[n]]; }
+    hs=bones.Hips.position.y/xr.hy; }
+  scene.add(model);
+  let lo=Infinity, hi=-Infinity; model.traverse(o=>{ if(o.isMesh){ o.geometry.computeBoundingBox(); lo=Math.min(lo,o.geometry.boundingBox.min.y); hi=Math.max(hi,o.geometry.boundingBox.max.y); } });
+  const hy=bones.Hips.getWorldPosition(new THREE.Vector3()).y, ky=bones.LeftLeg?bones.LeftLeg.getWorldPosition(new THREE.Vector3()).y:0, th=hy-ky, wv=new THREE.Vector3();
+  const paint=meshes.map(o=>{ const pos=o.geometry.attributes.position, mask=new Uint8Array(pos.count); for(let i=0;i<pos.count;i++){ if(xbot){ const h=(pos.getY(i)-lo)/(hi-lo); mask[i]=(h>.345&&h<.585)?1:0; } else { const y=wv.fromBufferAttribute(pos,i).applyMatrix4(o.matrixWorld).y; mask[i]=(y<hy+.2*th&&y>ky+.42*th)?1:0; } }
     o.geometry.setAttribute('color',new THREE.BufferAttribute(new Float32Array(pos.count*3),3)); o.material.vertexColors=true; o.material.color.set(0xffffff); o.material.needsUpdate=true; return {o,mask,joint:/Joints/.test(o.name)}; });
-  paintFighter(f);
-  // curl the fingers into fists: pick the axis and direction that brings the fingertip under the palm
-  for(const sd of ['Left','Right']){ const tip=bones[sd+'HandIndex4'], b1=bones[sd+'HandIndex1'], b2=bones[sd+'HandIndex2'], b3=bones[sd+'HandIndex3']; if(!tip||!b1||!b2||!b3) continue;
-    let best=null; for(const ax of ['x','z']) for(const sg of [1,-1]){ for(const b of [b1,b2,b3]) b.rotation[ax]+=sg*1.3; model.updateMatrixWorld(true); const y=tip.getWorldPosition(bv).y; for(const b of [b1,b2,b3]) b.rotation[ax]-=sg*1.3; if(!best||y<best.y) best={y,ax,sg}; }
+  for(const sd of ['Left','Right']){ const tip=bones[sd+'HandIndex4']||bones[sd+'HandIndex3'], b1=bones[sd+'HandIndex1'], b2=bones[sd+'HandIndex2'], b3=bones[sd+'HandIndex3']; if(!tip||!b1||!b2||!b3) continue; const tb=tip===b3?[b1,b2]:[b1,b2,b3];
+    let best=null; for(const ax of ['x','z']) for(const sg of [1,-1]){ for(const b of tb) b.rotation[ax]+=sg*1.3; model.updateMatrixWorld(true); const y=tip.getWorldPosition(bv).y; for(const b of tb) b.rotation[ax]-=sg*1.3; if(!best||y<best.y) best={y,ax,sg}; }
     for(const n in bones) if(n.indexOf(sd+'Hand')===0&&/[123]$/.test(n)&&n.indexOf('Thumb')<0) bones[n].rotation[best.ax]+=best.sg*1.3; }
   model.updateMatrixWorld(true);
   const k=SC*.9775/bones.Hips.getWorldPosition(bv).y; model.scale.setScalar(k); model.updateMatrixWorld(true);
   const sp=m.root.position.clone(), sr=m.root.rotation.y; m.root.position.set(0,0,0); m.root.rotation.y=0; applyRig(m,TPOSE); m.root.updateMatrixWorld(true);
-  const pairs=BONE_MAP.map(([r,b])=>({node:m[r],bone:bones[b],inv:m[r].getWorldQuaternion(new THREE.Quaternion()).invert(),rest:bones[b].getWorldQuaternion(new THREE.Quaternion())}));
+  const pairs=BONE_MAP.filter(([r,b])=>bones[b]).map(([r,b])=>({node:m[r],bone:bones[b],inv:m[r].getWorldQuaternion(new THREE.Quaternion()).invert(),rest:bones[b].getWorldQuaternion(new THREE.Quaternion())}));
   const feet=['Left','Right'].map(sd=>({bone:bones[sd+'Foot'],rest:bones[sd+'Foot'].getWorldQuaternion(new THREE.Quaternion()),local:bones[sd+'Foot'].quaternion.clone(),hy:sd==='Left'?'lhY':'rhY'}));
   m.root.position.copy(sp); m.root.rotation.y=sr;
   m.root.traverse(o=>{ if(o.isMesh) o.visible=false; });
-  const gm=new THREE.MeshStandardMaterial({color:0x17181b,roughness:.5}), ws=bones.LeftHand.getWorldScale(bv).x;
+  const gm=new THREE.MeshStandardMaterial({color:0x17181b,roughness:.5}), ws=bones.LeftHand.getWorldScale(bv).x, gs=1;
+  if(!xbot) for(const n in bones) if(/Hand(Index|Middle|Ring|Pinky|Thumb)1$/.test(n)) bones[n].scale.setScalar(.6);
   for(const sd of ['Left','Right']){ const h=bones[sd+'Hand']; if(!h) continue;
-    const g=new THREE.Mesh(new THREE.SphereGeometry(.078,14,10),gm); g.scale.set(1/ws,1.2/ws,1.05/ws); g.position.y=.075/ws; g.castShadow=true; h.add(g); }
+    const g=new THREE.Mesh(new THREE.SphereGeometry(.078*gs,14,10),gm); g.scale.set(1/ws,1.2/ws,1.05/ws); g.position.y=.075/ws; g.castShadow=true; h.add(g); }
   const mapped={}; BONE_MAP.forEach(x=>mapped[x[1]]=1); mapped.LeftFoot=mapped.RightFoot=1;
-  f.body={model,pairs,feet,hips:bones.Hips,bones,mapped};
+  model.visible=false;
+  if(!f.bodies) f.bodies={}; f.bodies[kind]={kind,model,pairs,feet,hips:bones.Hips,bones,mapped,paint,tint,rt,hs};
+  paintFighter(f); selectBody(f);
 }
 const CLIP_OF={upper:'uppercut',fin_p:'quad',fin_k:'mmakick',jcounter:'straight',jab:'ljab',ljabR:'ljab',onetwo:'jc',bodyjc:'bjc',straight:'straight',overhand:'cross',hook:'hook',calf:'kick',low:'kick',high:'round',elbow:'elbow',knee:'knee'};
 const cq=new THREE.Quaternion(), cv=new THREE.Vector3(), IDQ=new THREE.Quaternion();
@@ -1264,17 +1293,18 @@ function applyClip(f,dt){
     cq.set(arr[o],arr[o+1],arr[o+2],arr[o+3]); q2.set(arr[o+4],arr[o+5],arr[o+6],arr[o+7]); cq.slerp(q2,a);
     if(pc&&pc.q[n]){ const pr=pc.q[n], po=pi*4; qP.set(pr[po],pr[po+1],pr[po+2],pr[po+3]); qP2.set(pr[po+4],pr[po+5],pr[po+6],pr[po+7]); qP.slerp(qP2,pa); cq.slerp(qP,xfE); }
     if(n==='Hips'){ q1.setFromAxisAngle(YAX,yaw); cq.premultiply(q1); }
-    if(!b.mapped[n]) bn.quaternion.copy(IDQ);
+    const R=b.rt&&b.rt[n]; if(R) cq.premultiply(R[0]).multiply(R[1]);
+    if(!b.mapped[n]){ bn.quaternion.copy(IDQ); if(R) bn.quaternion.premultiply(R[0]).multiply(R[1]); }
     bn.quaternion.slerp(cq,w); }
   const hs=(f.state==='move'&&HIPSCALE[f.mid])||1; f.hsNow=hs; const hp=c.hp, cur=sampHp(c,f.clipT); let px=hp[0]+(cur[0]-hp[0])*hs, py=cur[1], pz=hp[2]+(cur[2]-hp[2])*hs;
   if(pc){ const pv=sampHp(pc,f.pT), ph=f.pHs||1, qx=pc.hp[0]+(pv[0]-pc.hp[0])*ph, qz=pc.hp[2]+(pv[2]-pc.hp[2])*ph; px+=(qx-px)*xfE; py+=(pv[1]-py)*xfE; pz+=(qz-pz)*xfE; }
-  const cs=Math.cos(yaw), sn=Math.sin(yaw);
+  const cs=Math.cos(yaw), sn=Math.sin(yaw), bs=b.hs||1; px*=bs; py*=bs; pz*=bs;
   cv.set(f.m.root.position.x,0,f.m.root.position.z); b.hips.parent.worldToLocal(cv); cv.x+=px*cs+pz*sn; cv.y+=py; cv.z+=-px*sn+pz*cs;
   b.hips.position.lerp(cv,w);
   f.gT=f.guard&&f.state==='stand'?(f.gT||0)+dt:0; const BK=window.MOCAP.block;
   if(armsOwn&&BK){ const tb=Math.min(.3,f.gT*2.2), bx=Math.min(BK.n-1.001,tb*BK.fps), bi=Math.floor(bx), ba=bx-bi, gw=w*Math.min(1,f.gT*8);
     for(const n in BK.q){ if(!ARMB.test(n)) continue; const bn=b.bones[n]; if(!bn) continue; const arr=BK.q[n], o=bi*4;
-      cq.set(arr[o],arr[o+1],arr[o+2],arr[o+3]); q2.set(arr[o+4],arr[o+5],arr[o+6],arr[o+7]); cq.slerp(q2,ba); bn.quaternion.slerp(cq,gw); } }
+      cq.set(arr[o],arr[o+1],arr[o+2],arr[o+3]); q2.set(arr[o+4],arr[o+5],arr[o+6],arr[o+7]); cq.slerp(q2,ba); const R=b.rt&&b.rt[n]; if(R) cq.premultiply(R[0]).multiply(R[1]); bn.quaternion.slerp(cq,gw); } }
 }
 function syncBody(f){
   const b=f.body; if(!b) return; const m=f.m, c=f.cur; m.root.updateMatrixWorld(true);
@@ -1290,9 +1320,12 @@ function syncBody(f){
   postLayers(f,f.dtA||.016);
 }
 function loadBodies(){
-  const b64=window.BODY_GLB_B64; if(!THREE.GLTFLoader||!b64) return;
-  try{ const bin=atob(b64), buf=new Uint8Array(bin.length); for(let i=0;i<bin.length;i++) buf[i]=bin.charCodeAt(i); window.BODY_GLB_B64=null;
-    const L=new THREE.GLTFLoader(); F.forEach(f=>L.parse(buf.buffer.slice(0),'',g=>{ try{ attachBody(f,g); }catch(e){ console.warn(e); } },()=>{})); L.parse(buf.buffer.slice(0),'',g=>{ try{ attachRef(g); }catch(e){ console.warn(e); } },()=>{}); }catch(e){ console.warn(e); }
+  if(!THREE.GLTFLoader) return; const dec=k=>{ const b64=window[k]; if(!b64) return null; window[k]=null; const bin=atob(b64), buf=new Uint8Array(bin.length); for(let i=0;i<bin.length;i++) buf[i]=bin.charCodeAt(i); return buf.buffer; };
+  const L=new THREE.GLTFLoader(), parse=ab=>new Promise(res=>L.parse(ab.slice(0),'',res,e=>{ console.warn(e); res(null); }));
+  (async()=>{ try{ const xb=dec('BODY_GLB_B64'), hb=dec('HUMAN_GLB_B64'), bb=dec('BRUTE_GLB_B64'); if(!xb) return;
+    const rg=await parse(xb); let xr=null; if(rg){ rg.scene.updateMatrixWorld(true); xr={q:{},hy:1}; rg.scene.traverse(o=>{ if(o.isBone){ const n=BNAME(o.name); xr.q[n]=o.getWorldQuaternion(new THREE.Quaternion()); if(n==='Hips') xr.hy=o.position.y; } }); try{ attachRef(rg); }catch(e){ console.warn(e); } }
+    for(const f of F){ for(const [kind,ab] of [[hb?'human':'xbot',hb||xb],['brute',bb]]){ if(!ab) continue; const g=await parse(ab); if(g) try{ attachBody(f,g,kind,xr); }catch(e){ console.warn(e); } } }
+  }catch(e){ console.warn(e); } })();
 }
 function angLerp(a,b,k){ let d=b-a; while(d>Math.PI) d-=Math.PI*2; while(d<-Math.PI) d+=Math.PI*2; return a+d*k; }
 function standExtras(f,t,dt,now){
@@ -1341,7 +1374,7 @@ function animate(f,dt,now){
 /* ---------- camera ---------- */
 const camPos=new THREE.Vector3(0,2.2,8), camLook=new THREE.Vector3(0,1.1,0), cT=new THREE.Vector3(), cL=new THREE.Vector3();
 let menuAng=0;
-function bodyVis(f,v){ if(!f.body) return; if(!f.bodyRoot){ let o=f.body.bones.Hips; while(o.parent&&o.parent!==scene) o=o.parent; f.bodyRoot=o; } f.bodyRoot.visible=v; }
+function bodyVis(f,v){ f.bodyShown=v; if(f.body) f.body.model.visible=v; }
 function updateCamera(dt){
   if(game.state==='intro'){ introCam(dt); return; }
   if(game.state!=='play'&&game.state!=='vs'&&game.state!=='break'&&!game.over){ menuAng+=dt*.12;
